@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
         final BookAdapter adapter = new BookAdapter();
@@ -90,9 +91,34 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == NEW_BOOK_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
+            Book book = new Book(data.getStringExtra(EditBookActivity.EXTRA_EDIT_BOOK_TITLE),
+                    data.getStringExtra(EditBookActivity.EXTRA_EDIT_BOOK_AUTHOR));
+            bookViewModel.insert(book);
+            Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.book_added),
+                    Snackbar.LENGTH_LONG).show();
+        } else if (requestCode == EDIT_BOOK_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
+            editedBook.setTitle(data.getStringExtra(EditBookActivity.EXTRA_EDIT_BOOK_TITLE));
+            editedBook.setAuthor(data.getStringExtra(EditBookActivity.EXTRA_EDIT_BOOK_AUTHOR));
+            bookViewModel.update(editedBook);
+            editedBook = null;
+            Snackbar.make(findViewById(R.id.main_layout), getString(R.string.book_edited),
+                    Snackbar.LENGTH_LONG).show();
+        } else {
+            Snackbar.make(findViewById(R.id.main_layout),
+                            getString(R.string.empty_not_saved),
+                            Snackbar.LENGTH_LONG)
+                    .show();
+        }
+    }
+
     private class BookHolder extends RecyclerView.ViewHolder {
-        private TextView bookTitleTextView;
-        private TextView bookAuthorTextView;
+        private final TextView bookTitleTextView;
+        private final TextView bookAuthorTextView;
         private Book book;
 
         public BookHolder(LayoutInflater inflater, ViewGroup parent) {
@@ -119,8 +145,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void bind(Book book) {
-            bookTitleTextView.setText(book.gettitle());
-            bookAuthorTextView.setText(book.getauthor());
+            bookTitleTextView.setText(book.getTitle());
+            bookAuthorTextView.setText(book.getAuthor());
             this.book = book;
         }
     }
@@ -129,12 +155,12 @@ public class MainActivity extends AppCompatActivity {
 
         @NonNull
         @Override
-        public BookHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public BookHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             return new BookHolder(getLayoutInflater(), parent);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull BookHolder holder, int position) {
+        public void onBindViewHolder(BookHolder holder, int position) {
             if (books != null) {
                 Book book = books.get(position);
                 holder.bind(book);
@@ -143,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        @Override
         public int getItemCount() {
             if (books != null) {
                 return books.size();
@@ -155,31 +180,6 @@ public class MainActivity extends AppCompatActivity {
         void setBooks(List<Book> books) {
             this.books = books;
             notifyDataSetChanged();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == NEW_BOOK_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            Book book = new Book(data.getStringExtra(EditBookActivity.EXTRA_EDIT_BOOK_TITLE),
-                    data.getStringExtra(EditBookActivity.EXTRA_EDIT_BOOK_AUTHOR));
-            bookViewModel.insert(book);
-            Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.book_added),
-                    Snackbar.LENGTH_LONG).show();
-        } else if (requestCode == EDIT_BOOK_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            editedBook.settitle(data.getStringExtra(EditBookActivity.EXTRA_EDIT_BOOK_TITLE));
-            editedBook.setauthor(data.getStringExtra(EditBookActivity.EXTRA_EDIT_BOOK_AUTHOR));
-            bookViewModel.update(editedBook);
-            editedBook = null;
-            Snackbar.make(findViewById(R.id.main_layout), getString(R.string.book_edited),
-                    Snackbar.LENGTH_LONG).show();
-        } else {
-            Snackbar.make(findViewById(R.id.main_layout),
-                            getString(R.string.empty_not_saved),
-                            Snackbar.LENGTH_LONG)
-                    .show();
         }
     }
 }

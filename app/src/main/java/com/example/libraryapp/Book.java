@@ -14,22 +14,22 @@ public class Book {
         this.title = title;
         this.author = author;
     }
-    public int getid(){
+    public int getId(){
         return id;
     }
-    public String gettitle(){
+    public String getTitle(){
         return title;
     }
-    public String getauthor(){
+    public String getAuthor(){
         return author;
     }
-    public void setid(int id){
+    public void setId(int id){
         this.id=id;
     }
-    public void settitle(String title){
+    public void setTitle(String title){
         this.title=title;
     }
-    public void setauthor(String author){
+    public void setAuthor(String author){
         this.author=author;
     }
 }
